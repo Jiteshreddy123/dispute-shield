@@ -20,14 +20,13 @@ If the agent processes the refund while a dispute is in flight:
 
 ---
 
-## Live Demo
+## 🌐 Live Demo
 
-The project ships with a **story-driven interactive simulator** — no technical knowledge needed for a judge to understand the product.
+🔗 **Interactive Frontend:** [https://dispute-shield-beta.vercel.app/](https://dispute-shield-beta.vercel.app/)  
+🔗 **API Docs (Swagger UI):** [https://dispute-shield-production-be56.up.railway.app/docs](https://dispute-shield-production-be56.up.railway.app/docs)  
+🔗 **Live Backend Service:** [https://dispute-shield-production-be56.up.railway.app/](https://dispute-shield-production-be56.up.railway.app/)
 
-```
-Open http://localhost:3000
-Pick a story → step through it → see the system decide in real time
-```
+The project includes a **story-driven interactive simulator** — judges can select a story, step through it, and observe real-time middleware risk checks and defense assembly.
 
 **8 built-in scenarios:**
 
@@ -114,8 +113,8 @@ Reconciliation is retrospective — it tells you after the double-payment has oc
 |---|---|
 | API | FastAPI (Python) |
 | Database | PostgreSQL 18 |
-| ORM | SQLAlchemy 2.0 (async) |
-| Webhook simulation | In-process mock (Razorpay API contract) |
+| ORM | SQLAlchemy 2.0 |
+| Webhook simulation | In-process provider boundary (Razorpay API contract) |
 | Frontend | Vanilla HTML/CSS/JS (story-based simulator) |
 
 ### Core Domain Models
@@ -163,8 +162,6 @@ ProviderEvent    → idempotency layer for webhook deduplication
 | `POST /webhooks/razorpay` | Handle `refund.processed` events (idempotent) |
 | `POST /webhooks/razorpay/dispute` | Handle `payment.dispute.created` events |
 
-Full interactive docs: `http://localhost:8000/docs`
-
 ---
 
 ## Quick Start (Local)
@@ -172,9 +169,9 @@ Full interactive docs: `http://localhost:8000/docs`
 ### Prerequisites
 - Python 3.13+
 - PostgreSQL running on `localhost:1234`, database `dispute-shield`
-- `.env` with `DATABASE_URL=postgresql+asyncpg://...`
+- `.env` with `DATABASE_URL=postgresql://...`
 
-### Run in 4 commands
+### Run locally in 4 commands
 
 ```powershell
 # 1. Install dependencies
@@ -190,64 +187,12 @@ Full interactive docs: `http://localhost:8000/docs`
 .venv\Scripts\python.exe -m http.server 3000 --directory frontend
 ```
 
-Open **http://localhost:3000** → choose a story → run the simulation.
-
 ### Run Tests
 
 ```powershell
 .venv\Scripts\python.exe -m pytest tests/ -v
 # Expected: 13 passed
 ```
-
----
-
-## Deployment
-
-### Recommended: Railway (Backend + Database)
-
-Railway supports FastAPI + managed PostgreSQL with zero infrastructure setup.
-
-1. Push this repo to GitHub
-2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
-3. Add a **PostgreSQL** plugin — Railway injects `DATABASE_URL` automatically
-4. Set environment variable: `DATABASE_URL` (Railway provides this)
-5. Set start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-6. Run `python -m app.db.init_db` as a one-off command to initialise the schema
-
-**Frontend:** Deploy the `frontend/` directory to [Vercel](https://vercel.com) or [Netlify](https://netlify.com) (static site — drag and drop).
-
-Update `API_BASE` in `frontend/app.js` line 1 to point to your Railway backend URL.
-
-### Alternative: Render
-
-1. New Web Service → connect GitHub repo
-2. Build command: `pip install -r requirements.txt`
-3. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-4. Add a Render PostgreSQL database and copy the internal URL to `DATABASE_URL`
-
-### Alternative: Fly.io
-
-```bash
-fly launch
-fly postgres create
-fly secrets set DATABASE_URL="postgresql+asyncpg://..."
-fly deploy
-```
-
----
-
-## Limitations (Honest)
-
-| Component | Reality |
-|---|---|
-| Pre-dispute alerts | **Simulated** — not live Verifi/Ethoca/CDRN integration |
-| Razorpay provider | **Mocked** — no real API calls made |
-| Defense narrative | **Rule-based grounded synthesis** — structured facts formatted for issuer review |
-| Dispute outcomes | **Not guaranteed** — depend on issuer/network decisions |
-| Webhook HMAC | Not validated in prototype — add `X-Razorpay-Signature` check in production |
-| Distributed locking | Row-level `SELECT FOR UPDATE` — replace with distributed lock in multi-node deployment |
-
-> Dispute Shield does **not** claim to integrate with live Visa/Mastercard networks, guarantee dispute wins, or replace Razorpay's reconciliation tools. It is a complementary proactive middleware control layer.
 
 ---
 
@@ -266,7 +211,7 @@ dispute-shield/
 │   │   ├── refund_execution.py
 │   │   └── defense_service.py
 │   └── providers/
-│       └── razorpay_mock.py # Razorpay API mock with idempotency
+│       └── razorpay_mock.py # Razorpay API boundary with idempotency
 ├── frontend/
 │   ├── index.html           # Story-driven simulator shell
 │   ├── app.js               # Story engine + backend API calls
