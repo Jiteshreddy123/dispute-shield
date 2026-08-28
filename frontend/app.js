@@ -10,7 +10,7 @@
  * - The story engine calls /api/scenarios/reset + /api/scenarios/load/ before each run
  */
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'http://localhost:https://dispute-shield-production-be56.up.railway.app/';
 
 // ============================================================
 // API HELPERS
@@ -47,17 +47,17 @@ function inr(paise) {
 // ============================================================
 
 const engine = {
-  story:          null,   // current STORY object
-  stepIndex:      0,
-  scenarioData:   null,   // from /api/scenarios/load/
-  stateData:      null,   // from /api/state/{payment_id}
-  refundData:     null,   // from /api/refunds/request
-  defenseData:    null,   // from /api/defense/{dispute_id}
-  techLogs:       [],
+  story: null,   // current STORY object
+  stepIndex: 0,
+  scenarioData: null,   // from /api/scenarios/load/
+  stateData: null,   // from /api/state/{payment_id}
+  refundData: null,   // from /api/refunds/request
+  defenseData: null,   // from /api/defense/{dispute_id}
+  techLogs: [],
   // Transient per-step
-  _stepResultData:   null,
-  _dupEventId:       null,
-  _wfEventId:        null,
+  _stepResultData: null,
+  _dupEventId: null,
+  _wfEventId: null,
 };
 
 // ============================================================
@@ -71,23 +71,23 @@ const STORIES = [
   // STORY 1 — PRE_ALERT (HERO)
   // ════════════════════════════════════════════════════════════
   {
-    id:              'PRE_ALERT',
+    id: 'PRE_ALERT',
     scenarioApiName: 'PRE_ALERT',
-    paymentId:       'scen_alert_001',
-    amountPaise:     300000,
-    num:             '01',
-    icon:            '⚡',
-    badge:           'HERO',
-    badgeClass:      'badge-hero',
-    featured:        true,
-    riskClass:       'risk-high',
-    title:           'A Dispute Is Brewing',
-    tagline:         'Ramu asks for a refund while his bank has already signalled a dispute on the same payment.',
-    customer:        'Ramu Kumar',
-    product:         'Winter Jacket',
-    amountDisplay:   '₹3,000',
-    risk:            'Pre-dispute network alert',
-    outcomeLabel:    'Refund BLOCKED — ₹3,000 duplicate outflow prevented',
+    paymentId: 'scen_alert_001',
+    amountPaise: 300000,
+    num: '01',
+    icon: '⚡',
+    badge: 'HERO',
+    badgeClass: 'badge-hero',
+    featured: true,
+    riskClass: 'risk-high',
+    title: 'A Dispute Is Brewing',
+    tagline: 'Ramu asks for a refund while his bank has already signalled a dispute on the same payment.',
+    customer: 'Ramu Kumar',
+    product: 'Winter Jacket',
+    amountDisplay: '₹3,000',
+    risk: 'Pre-dispute network alert',
+    outcomeLabel: 'Refund BLOCKED — ₹3,000 duplicate outflow prevented',
     steps: [
       {
         phase: 'Purchase',
@@ -95,11 +95,11 @@ const STORIES = [
         heading: 'Ramu Makes a Purchase',
         narrative: 'Ramu Kumar visits Acme Fashion and orders a winter jacket for ₹3,000. The payment is captured immediately.',
         cards: [
-          { label: 'Customer',  value: 'Ramu Kumar' },
-          { label: 'Product',   value: 'Winter Jacket' },
-          { label: 'Order',     value: 'ORD-2847' },
-          { label: 'Amount',    value: '₹3,000',          cls: 'highlight' },
-          { label: 'Status',    value: 'Payment Captured', cls: 'green' },
+          { label: 'Customer', value: 'Ramu Kumar' },
+          { label: 'Product', value: 'Winter Jacket' },
+          { label: 'Order', value: 'ORD-2847' },
+          { label: 'Amount', value: '₹3,000', cls: 'highlight' },
+          { label: 'Status', value: 'Payment Captured', cls: 'green' },
         ],
         cta: 'Three Days Later →',
         ctaClass: 'cta-continue',
@@ -111,8 +111,8 @@ const STORIES = [
         narrative: 'Unbeknownst to the merchant, a pre-dispute network alert arrives from the card network. This simulates a Visa/Mastercard signal indicating the customer may be about to dispute this payment.',
         cards: [
           { label: 'Alert Type', value: 'Pre-dispute signal (simulated)' },
-          { label: 'Provider',   value: 'Simulated Network Feed' },
-          { label: 'Status',     value: 'OPEN',     cls: 'red' },
+          { label: 'Provider', value: 'Simulated Network Feed' },
+          { label: 'Status', value: 'OPEN', cls: 'red' },
           { label: 'Payment at Risk', value: '₹3,000', cls: 'red' },
         ],
         cta: 'Meanwhile, Ramu Contacts Support →',
@@ -126,7 +126,7 @@ const STORIES = [
         quote: '"The jacket never arrived. It\'s been 3 days and I haven\'t received anything. Please refund my ₹3,000 immediately."',
         cards: [
           { label: 'Channel', value: 'Email Support' },
-          { label: 'Day',     value: 'Day 3' },
+          { label: 'Day', value: 'Day 3' },
           { label: 'Request', value: 'Full refund of ₹3,000', cls: 'highlight' },
         ],
         cta: 'Support Opens Refund →',
@@ -139,7 +139,7 @@ const STORIES = [
         narrative: 'The support agent finds the order and prepares to issue a full refund. Dispute Shield intercepts the request before it reaches the payment provider.',
         cards: [
           { label: 'Refund Amount', value: '₹3,000' },
-          { label: 'Payment ID',   value: 'scen_alert_001', cls: 'mono' },
+          { label: 'Payment ID', value: 'scen_alert_001', cls: 'mono' },
         ],
         cta: '💳 Refund ₹3,000',
         ctaClass: 'cta-refund',
@@ -177,11 +177,11 @@ const STORIES = [
             icon: '🛡️',
             title: 'Dispute Shield Outcome',
             items: [
-              { label: 'Refund Decision',   value: 'BLOCKED',                            cls: 'red' },
-              { label: 'Reason',            value: 'Active pre-dispute alert detected'              },
-              { label: 'Amount Protected',  value: inr(eng.story.amountPaise),           cls: 'green' },
-              { label: 'Provider Called',   value: 'No — refund never sent to Razorpay', cls: 'green' },
-              { label: 'Intent Status',     value: rd.status || 'BLOCKED',               cls: 'red' },
+              { label: 'Refund Decision', value: 'BLOCKED', cls: 'red' },
+              { label: 'Reason', value: 'Active pre-dispute alert detected' },
+              { label: 'Amount Protected', value: inr(eng.story.amountPaise), cls: 'green' },
+              { label: 'Provider Called', value: 'No — refund never sent to Razorpay', cls: 'green' },
+              { label: 'Intent Status', value: rd.status || 'BLOCKED', cls: 'red' },
             ],
           };
         },
@@ -196,22 +196,22 @@ const STORIES = [
   // STORY 2 — ACTIVE_DISPUTE
   // ════════════════════════════════════════════════════════════
   {
-    id:              'ACTIVE_DISPUTE',
+    id: 'ACTIVE_DISPUTE',
     scenarioApiName: 'ACTIVE_DISPUTE',
-    paymentId:       'scen_dispute_001',
-    amountPaise:     500000,
-    num:             '02',
-    icon:            '⚔️',
-    badge:           null,
-    featured:        false,
-    riskClass:       'risk-high',
-    title:           'A Chargeback Is Already Open',
-    tagline:         'Ramu files a bank dispute, then also asks the merchant for a refund on the same payment.',
-    customer:        'Ramu Kumar',
-    product:         'Running Shoes',
-    amountDisplay:   '₹5,000',
-    risk:            'Active chargeback + refund request',
-    outcomeLabel:    'Refund BLOCKED — double liability prevented',
+    paymentId: 'scen_dispute_001',
+    amountPaise: 500000,
+    num: '02',
+    icon: '⚔️',
+    badge: null,
+    featured: false,
+    riskClass: 'risk-high',
+    title: 'A Chargeback Is Already Open',
+    tagline: 'Ramu files a bank dispute, then also asks the merchant for a refund on the same payment.',
+    customer: 'Ramu Kumar',
+    product: 'Running Shoes',
+    amountDisplay: '₹5,000',
+    risk: 'Active chargeback + refund request',
+    outcomeLabel: 'Refund BLOCKED — double liability prevented',
     steps: [
       {
         phase: 'Purchase',
@@ -220,9 +220,9 @@ const STORIES = [
         narrative: 'Ramu orders a pair of premium running shoes for ₹5,000. Payment is captured.',
         cards: [
           { label: 'Customer', value: 'Ramu Kumar' },
-          { label: 'Product',  value: 'Running Shoes' },
-          { label: 'Amount',   value: '₹5,000', cls: 'highlight' },
-          { label: 'Status',   value: 'Payment Captured', cls: 'green' },
+          { label: 'Product', value: 'Running Shoes' },
+          { label: 'Amount', value: '₹5,000', cls: 'highlight' },
+          { label: 'Status', value: 'Payment Captured', cls: 'green' },
         ],
         cta: 'A Week Later →',
         ctaClass: 'cta-continue',
@@ -233,10 +233,10 @@ const STORIES = [
         heading: 'Ramu Files a Bank Dispute',
         narrative: 'Ramu tells his bank the shoes never arrived. The bank opens a formal chargeback on the payment.',
         cards: [
-          { label: 'Action',         value: 'Chargeback filed with bank' },
-          { label: 'Amount',         value: '₹5,000', cls: 'red' },
-          { label: 'Dispute Status', value: 'OPEN',   cls: 'red' },
-          { label: 'Phase',          value: 'Chargeback' },
+          { label: 'Action', value: 'Chargeback filed with bank' },
+          { label: 'Amount', value: '₹5,000', cls: 'red' },
+          { label: 'Dispute Status', value: 'OPEN', cls: 'red' },
+          { label: 'Phase', value: 'Chargeback' },
         ],
         cta: 'Meanwhile at Support →',
         ctaClass: 'cta-continue',
@@ -250,7 +250,7 @@ const STORIES = [
         cards: [
           { label: 'Channel', value: 'Email Support' },
           { label: 'Request', value: 'Full refund of ₹5,000' },
-          { label: 'Note',    value: 'Bank dispute not disclosed', cls: 'red' },
+          { label: 'Note', value: 'Bank dispute not disclosed', cls: 'red' },
         ],
         cta: 'Support Initiates Refund →',
         ctaClass: 'cta-continue',
@@ -262,7 +262,7 @@ const STORIES = [
         narrative: 'The support agent processes the refund request. Dispute Shield intercepts it and runs a risk check before any money moves.',
         cards: [
           { label: 'Refund Amount', value: '₹5,000' },
-          { label: 'Payment ID',   value: 'scen_dispute_001', cls: 'mono' },
+          { label: 'Payment ID', value: 'scen_dispute_001', cls: 'mono' },
         ],
         cta: '💳 Refund ₹5,000',
         ctaClass: 'cta-refund',
@@ -297,11 +297,11 @@ const STORIES = [
           icon: '🛡️',
           title: 'Dispute Shield Outcome',
           items: [
-            { label: 'Refund Decision',  value: 'BLOCKED',                                   cls: 'red' },
-            { label: 'Reason',           value: 'Active chargeback exists on this payment'             },
-            { label: 'Amount Protected', value: inr(eng.story.amountPaise),                  cls: 'green' },
-            { label: 'Bank Dispute',     value: 'OPEN — still to be resolved by bank',        cls: 'orange' },
-            { label: 'Double Payment',   value: 'Prevented',                                 cls: 'green' },
+            { label: 'Refund Decision', value: 'BLOCKED', cls: 'red' },
+            { label: 'Reason', value: 'Active chargeback exists on this payment' },
+            { label: 'Amount Protected', value: inr(eng.story.amountPaise), cls: 'green' },
+            { label: 'Bank Dispute', value: 'OPEN — still to be resolved by bank', cls: 'orange' },
+            { label: 'Double Payment', value: 'Prevented', cls: 'green' },
           ],
         }),
         cta: '↺ Replay Story',
@@ -315,24 +315,24 @@ const STORIES = [
   // STORY 3 — REFUND_THEN_CHARGEBACK (conflicting recovery)
   // ════════════════════════════════════════════════════════════
   {
-    id:              'REFUND_THEN_CHARGEBACK',
+    id: 'REFUND_THEN_CHARGEBACK',
     scenarioApiName: 'REFUND_THEN_CHARGEBACK',
-    paymentId:       'scen_rtc_001',
-    amountPaise:     800000,
-    disputeId:       'disp_rtc_001',
-    num:             '03',
-    icon:            '🕵️',
-    badge:           'DEFENSE',
-    badgeClass:      'badge-defense',
-    featured:        false,
-    riskClass:       'risk-med',
-    title:           'Refunded — Then Charged Back',
-    tagline:         'Ramu receives a full refund, then files a chargeback for the same ₹8,000 transaction.',
-    customer:        'Ramu Kumar',
-    product:         'Laptop Stand',
-    amountDisplay:   '₹8,000',
-    risk:            'Conflicting recovery request',
-    outcomeLabel:    'Defense package ready — ₹8,000 fully covered',
+    paymentId: 'scen_rtc_001',
+    amountPaise: 800000,
+    disputeId: 'disp_rtc_001',
+    num: '03',
+    icon: '🕵️',
+    badge: 'DEFENSE',
+    badgeClass: 'badge-defense',
+    featured: false,
+    riskClass: 'risk-med',
+    title: 'Refunded — Then Charged Back',
+    tagline: 'Ramu receives a full refund, then files a chargeback for the same ₹8,000 transaction.',
+    customer: 'Ramu Kumar',
+    product: 'Laptop Stand',
+    amountDisplay: '₹8,000',
+    risk: 'Conflicting recovery request',
+    outcomeLabel: 'Defense package ready — ₹8,000 fully covered',
     steps: [
       {
         phase: 'Purchase',
@@ -341,9 +341,9 @@ const STORIES = [
         narrative: 'Ramu purchases a premium laptop stand for ₹8,000. Payment is captured.',
         cards: [
           { label: 'Customer', value: 'Ramu Kumar' },
-          { label: 'Product',  value: 'Laptop Stand' },
-          { label: 'Amount',   value: '₹8,000', cls: 'highlight' },
-          { label: 'Status',   value: 'Payment Captured', cls: 'green' },
+          { label: 'Product', value: 'Laptop Stand' },
+          { label: 'Amount', value: '₹8,000', cls: 'highlight' },
+          { label: 'Status', value: 'Payment Captured', cls: 'green' },
         ],
         cta: 'Three Days Later →',
         ctaClass: 'cta-continue',
@@ -355,7 +355,7 @@ const STORIES = [
         narrative: 'Ramu contacts support saying the laptop stand never arrived.',
         quote: '"I want to return the product. I was promised a full refund."',
         cards: [
-          { label: 'Claim',     value: 'Item not received' },
+          { label: 'Claim', value: 'Item not received' },
           { label: 'Requested', value: 'Full refund of ₹8,000' },
         ],
         cta: 'Merchant Issues Full Refund →',
@@ -370,10 +370,10 @@ const STORIES = [
           const r = (eng.stateData?.refunds || [])[0] || {};
           return {
             cards: [
-              { label: 'Refund Amount', value: '₹8,000',                       cls: 'green' },
-              { label: 'Status',        value: r.status || 'PROCESSED',         cls: 'green' },
-              { label: 'ARN',           value: r.arn || 'ARN987654321RTC',      cls: 'mono' },
-              { label: 'Refund ID',     value: r.id || 'rfnd_rtc_001',          cls: 'mono' },
+              { label: 'Refund Amount', value: '₹8,000', cls: 'green' },
+              { label: 'Status', value: r.status || 'PROCESSED', cls: 'green' },
+              { label: 'ARN', value: r.arn || 'ARN987654321RTC', cls: 'mono' },
+              { label: 'Refund ID', value: r.id || 'rfnd_rtc_001', cls: 'mono' },
             ],
           };
         },
@@ -386,10 +386,10 @@ const STORIES = [
         heading: 'Ramu Files a Chargeback Anyway',
         narrative: 'Despite already receiving a full ₹8,000 refund, Ramu contacts his bank and disputes the original charge. The bank opens a chargeback.',
         cards: [
-          { label: 'Action',           value: 'Chargeback filed with bank'              },
-          { label: 'Chargeback Amount', value: '₹8,000',                      cls: 'red' },
-          { label: 'Prior Refund',      value: '₹8,000 already processed',     cls: 'orange' },
-          { label: 'Assessment',        value: 'Potential duplicate recovery attempt',   },
+          { label: 'Action', value: 'Chargeback filed with bank' },
+          { label: 'Chargeback Amount', value: '₹8,000', cls: 'red' },
+          { label: 'Prior Refund', value: '₹8,000 already processed', cls: 'orange' },
+          { label: 'Assessment', value: 'Potential duplicate recovery attempt', },
         ],
         cta: '⚖️ Build Defense Package',
         ctaClass: 'cta-api',
@@ -404,10 +404,10 @@ const STORIES = [
             return {
               defense: {
                 contestable: dp.contestable_amount_paise,
-                uncovered:   dp.uncovered_amount_paise,
-                status:      dp.status,
-                evidence:    data.evidence_items || [],
-                summary:     dp.summary,
+                uncovered: dp.uncovered_amount_paise,
+                status: dp.status,
+                evidence: data.evidence_items || [],
+                summary: dp.summary,
               },
             };
           },
@@ -427,11 +427,11 @@ const STORIES = [
             icon: '⚖️',
             title: 'Defense Package',
             items: [
-              { label: 'Chargeback Amount',   value: '₹8,000',                                                           cls: 'red' },
-              { label: 'Contestable (covered)', value: inr(dp.contestable_amount_paise || 800000),                        cls: 'green' },
-              { label: 'Uncovered Exposure',  value: inr(dp.uncovered_amount_paise || 0),                                 cls: dp.uncovered_amount_paise > 0 ? 'red' : 'green' },
-              { label: 'Evidence Items',      value: `${ev.length} item${ev.length !== 1 ? 's' : ''} attached`,           cls: 'green' },
-              { label: 'Package Status',      value: dp.status || 'READY',                                               cls: 'green' },
+              { label: 'Chargeback Amount', value: '₹8,000', cls: 'red' },
+              { label: 'Contestable (covered)', value: inr(dp.contestable_amount_paise || 800000), cls: 'green' },
+              { label: 'Uncovered Exposure', value: inr(dp.uncovered_amount_paise || 0), cls: dp.uncovered_amount_paise > 0 ? 'red' : 'green' },
+              { label: 'Evidence Items', value: `${ev.length} item${ev.length !== 1 ? 's' : ''} attached`, cls: 'green' },
+              { label: 'Package Status', value: dp.status || 'READY', cls: 'green' },
             ],
           };
         },
@@ -446,23 +446,23 @@ const STORIES = [
   // STORY 4 — SAFE_REFUND
   // ════════════════════════════════════════════════════════════
   {
-    id:              'SAFE_REFUND',
+    id: 'SAFE_REFUND',
     scenarioApiName: 'SAFE_REFUND',
-    paymentId:       'scen_safe_001',
-    amountPaise:     750000,
-    num:             '04',
-    icon:            '✅',
-    badge:           'SAFE',
-    badgeClass:      'badge-safe',
-    featured:        false,
-    riskClass:       'risk-low',
-    title:           'A Normal Refund',
-    tagline:         'A clean refund with no disputes — approved, executed, and confirmed with an ARN.',
-    customer:        'Priya Sharma',
-    product:         'Wireless Headphones',
-    amountDisplay:   '₹7,500',
-    risk:            'None detected',
-    outcomeLabel:    'Refund APPROVED — ARN issued',
+    paymentId: 'scen_safe_001',
+    amountPaise: 750000,
+    num: '04',
+    icon: '✅',
+    badge: 'SAFE',
+    badgeClass: 'badge-safe',
+    featured: false,
+    riskClass: 'risk-low',
+    title: 'A Normal Refund',
+    tagline: 'A clean refund with no disputes — approved, executed, and confirmed with an ARN.',
+    customer: 'Priya Sharma',
+    product: 'Wireless Headphones',
+    amountDisplay: '₹7,500',
+    risk: 'None detected',
+    outcomeLabel: 'Refund APPROVED — ARN issued',
     steps: [
       {
         phase: 'Purchase',
@@ -471,9 +471,9 @@ const STORIES = [
         narrative: 'Priya Sharma orders wireless headphones for ₹7,500. Payment is captured.',
         cards: [
           { label: 'Customer', value: 'Priya Sharma' },
-          { label: 'Product',  value: 'Wireless Headphones' },
-          { label: 'Amount',   value: '₹7,500', cls: 'highlight' },
-          { label: 'Status',   value: 'Payment Captured', cls: 'green' },
+          { label: 'Product', value: 'Wireless Headphones' },
+          { label: 'Amount', value: '₹7,500', cls: 'highlight' },
+          { label: 'Status', value: 'Payment Captured', cls: 'green' },
         ],
         cta: 'Two Days Later →',
         ctaClass: 'cta-continue',
@@ -485,9 +485,9 @@ const STORIES = [
         narrative: 'Priya contacts support. She hasn\'t received the order and requests a refund.',
         quote: '"Hi, I need a refund for my order. I haven\'t received it yet."',
         cards: [
-          { label: 'Disputes',   value: 'None',             cls: 'green' },
-          { label: 'Pre-alerts', value: 'None',             cls: 'green' },
-          { label: 'Balance',    value: '₹7,500 available', cls: 'green' },
+          { label: 'Disputes', value: 'None', cls: 'green' },
+          { label: 'Pre-alerts', value: 'None', cls: 'green' },
+          { label: 'Balance', value: '₹7,500 available', cls: 'green' },
         ],
         cta: 'Risk Check Passes →',
         ctaClass: 'cta-continue',
@@ -501,10 +501,10 @@ const STORIES = [
           const r = (eng.stateData?.refunds || [])[0] || {};
           return {
             cards: [
-              { label: 'Risk Check', value: 'PASSED',                    cls: 'green' },
-              { label: 'Decision',   value: 'APPROVED',                  cls: 'green' },
-              { label: 'Status',     value: r.status || 'PROCESSED',     cls: 'green' },
-              { label: 'ARN',        value: r.arn || 'ARN123456789SAFE', cls: 'mono' },
+              { label: 'Risk Check', value: 'PASSED', cls: 'green' },
+              { label: 'Decision', value: 'APPROVED', cls: 'green' },
+              { label: 'Status', value: r.status || 'PROCESSED', cls: 'green' },
+              { label: 'ARN', value: r.arn || 'ARN123456789SAFE', cls: 'mono' },
             ],
           };
         },
@@ -523,11 +523,11 @@ const STORIES = [
             icon: '✅',
             title: 'Clean Refund Executed',
             items: [
-              { label: 'Decision',  value: 'APPROVED',                              cls: 'green' },
-              { label: 'Amount',    value: '₹7,500',                                cls: 'green' },
-              { label: 'Status',    value: r.status || 'PROCESSED',                 cls: 'green' },
-              { label: 'ARN',       value: r.arn || 'ARN123456789SAFE',             cls: 'mono' },
-              { label: 'Ledger',    value: 'Immutable record created',              cls: 'green' },
+              { label: 'Decision', value: 'APPROVED', cls: 'green' },
+              { label: 'Amount', value: '₹7,500', cls: 'green' },
+              { label: 'Status', value: r.status || 'PROCESSED', cls: 'green' },
+              { label: 'ARN', value: r.arn || 'ARN123456789SAFE', cls: 'mono' },
+              { label: 'Ledger', value: 'Immutable record created', cls: 'green' },
             ],
           };
         },
@@ -542,23 +542,23 @@ const STORIES = [
   // STORY 5 — PARTIAL_REFUND_THEN_CHARGEBACK
   // ════════════════════════════════════════════════════════════
   {
-    id:              'PARTIAL_REFUND_THEN_CHARGEBACK',
+    id: 'PARTIAL_REFUND_THEN_CHARGEBACK',
     scenarioApiName: 'PARTIAL_REFUND_THEN_CHARGEBACK',
-    paymentId:       'scen_partial_001',
-    amountPaise:     1000000,
-    disputeId:       'disp_partial_001',
-    num:             '05',
-    icon:            '⚖️',
-    badge:           null,
-    featured:        false,
-    riskClass:       'risk-med',
-    title:           'Partial Refund, Full Chargeback',
-    tagline:         'Partial refunds were issued, but Ramu disputes the full ₹10,000 with his bank.',
-    customer:        'Ramu Kumar',
-    product:         'Fashion Bundle',
-    amountDisplay:   '₹10,000',
-    risk:            'Partial coverage — ₹4,000 exposed',
-    outcomeLabel:    '₹6,000 covered, ₹4,000 unresolved',
+    paymentId: 'scen_partial_001',
+    amountPaise: 1000000,
+    disputeId: 'disp_partial_001',
+    num: '05',
+    icon: '⚖️',
+    badge: null,
+    featured: false,
+    riskClass: 'risk-med',
+    title: 'Partial Refund, Full Chargeback',
+    tagline: 'Partial refunds were issued, but Ramu disputes the full ₹10,000 with his bank.',
+    customer: 'Ramu Kumar',
+    product: 'Fashion Bundle',
+    amountDisplay: '₹10,000',
+    risk: 'Partial coverage — ₹4,000 exposed',
+    outcomeLabel: '₹6,000 covered, ₹4,000 unresolved',
     steps: [
       {
         phase: 'Purchase',
@@ -567,9 +567,9 @@ const STORIES = [
         narrative: 'Ramu orders a bundle of clothing items for ₹10,000. Payment is captured.',
         cards: [
           { label: 'Customer', value: 'Ramu Kumar' },
-          { label: 'Product',  value: 'Fashion Bundle (3 items)' },
-          { label: 'Amount',   value: '₹10,000', cls: 'highlight' },
-          { label: 'Status',   value: 'Payment Captured', cls: 'green' },
+          { label: 'Product', value: 'Fashion Bundle (3 items)' },
+          { label: 'Amount', value: '₹10,000', cls: 'highlight' },
+          { label: 'Status', value: 'Payment Captured', cls: 'green' },
         ],
         cta: 'See What Happened →',
         ctaClass: 'cta-continue',
@@ -580,12 +580,12 @@ const STORIES = [
         heading: 'Two Partial Refunds Issued',
         narrative: 'Two items were not delivered. The merchant issues two partial refunds — ₹4,000 and ₹2,000 — for the missing items.',
         cards: [
-          { label: 'Refund 1 — Item A', value: '₹4,000',         cls: 'green' },
-          { label: 'ARN 1',             value: 'ARN_PARTIAL_001A', cls: 'mono' },
-          { label: 'Refund 2 — Item B', value: '₹2,000',         cls: 'green' },
-          { label: 'ARN 2',             value: 'ARN_PARTIAL_001B', cls: 'mono' },
-          { label: 'Total Refunded',    value: '₹6,000',          cls: 'green' },
-          { label: 'Remaining',         value: '₹4,000 (not yet refunded)' },
+          { label: 'Refund 1 — Item A', value: '₹4,000', cls: 'green' },
+          { label: 'ARN 1', value: 'ARN_PARTIAL_001A', cls: 'mono' },
+          { label: 'Refund 2 — Item B', value: '₹2,000', cls: 'green' },
+          { label: 'ARN 2', value: 'ARN_PARTIAL_001B', cls: 'mono' },
+          { label: 'Total Refunded', value: '₹6,000', cls: 'green' },
+          { label: 'Remaining', value: '₹4,000 (not yet refunded)' },
         ],
         cta: 'Then the Chargeback Arrives →',
         ctaClass: 'cta-continue',
@@ -597,8 +597,8 @@ const STORIES = [
         narrative: 'Despite receiving ₹6,000 in partial refunds, Ramu disputes the full original charge of ₹10,000 with his bank.',
         cards: [
           { label: 'Chargeback Amount', value: '₹10,000', cls: 'red' },
-          { label: 'Already Refunded',  value: '₹6,000',  cls: 'orange' },
-          { label: 'Net Exposure',      value: '₹4,000',  cls: 'red' },
+          { label: 'Already Refunded', value: '₹6,000', cls: 'orange' },
+          { label: 'Net Exposure', value: '₹4,000', cls: 'red' },
         ],
         cta: '⚖️ Analyse Defense',
         ctaClass: 'cta-api',
@@ -613,10 +613,10 @@ const STORIES = [
             return {
               defense: {
                 contestable: dp.contestable_amount_paise,
-                uncovered:   dp.uncovered_amount_paise,
-                status:      dp.status,
-                evidence:    data.evidence_items || [],
-                summary:     dp.summary,
+                uncovered: dp.uncovered_amount_paise,
+                status: dp.status,
+                evidence: data.evidence_items || [],
+                summary: dp.summary,
               },
             };
           },
@@ -636,11 +636,11 @@ const STORIES = [
             icon: '⚖️',
             title: 'Partial Defense Package',
             items: [
-              { label: 'Chargeback Amount',      value: '₹10,000',                                           cls: 'red' },
-              { label: 'Contestable (with ARNs)', value: inr(dp.contestable_amount_paise || 600000),          cls: 'green' },
-              { label: 'Uncovered Exposure',     value: inr(dp.uncovered_amount_paise || 400000),             cls: 'red' },
-              { label: 'Evidence Items',         value: `${ev.length} items`,                                cls: 'green' },
-              { label: 'Package Status',         value: dp.status || 'PARTIALLY_DEFENSIBLE',                 cls: 'orange' },
+              { label: 'Chargeback Amount', value: '₹10,000', cls: 'red' },
+              { label: 'Contestable (with ARNs)', value: inr(dp.contestable_amount_paise || 600000), cls: 'green' },
+              { label: 'Uncovered Exposure', value: inr(dp.uncovered_amount_paise || 400000), cls: 'red' },
+              { label: 'Evidence Items', value: `${ev.length} items`, cls: 'green' },
+              { label: 'Package Status', value: dp.status || 'PARTIALLY_DEFENSIBLE', cls: 'orange' },
             ],
           };
         },
@@ -655,24 +655,24 @@ const STORIES = [
   // STORY 6 — DUPLICATE_WEBHOOK
   // ════════════════════════════════════════════════════════════
   {
-    id:              'DUPLICATE_WEBHOOK',
+    id: 'DUPLICATE_WEBHOOK',
     scenarioApiName: 'DUPLICATE_WEBHOOK',
-    paymentId:       'scen_dup_001',
-    amountPaise:     400000,
+    paymentId: 'scen_dup_001',
+    amountPaise: 400000,
     refundIdForWebhook: 'rfnd_dup_001',
-    num:             '06',
-    icon:            '🔄',
-    badge:           'SYS',
-    badgeClass:      'badge-sys',
-    featured:        false,
-    riskClass:       'risk-sys',
-    title:           'The Webhook Arrived Twice',
-    tagline:         'The same refund confirmation is delivered twice by the payment provider.',
-    customer:        'System Reliability',
-    product:         '₹4,000 payment',
-    amountDisplay:   '₹4,000',
-    risk:            'Duplicate event delivery',
-    outcomeLabel:    'Exactly one financial effect',
+    num: '06',
+    icon: '🔄',
+    badge: 'SYS',
+    badgeClass: 'badge-sys',
+    featured: false,
+    riskClass: 'risk-sys',
+    title: 'The Webhook Arrived Twice',
+    tagline: 'The same refund confirmation is delivered twice by the payment provider.',
+    customer: 'System Reliability',
+    product: '₹4,000 payment',
+    amountDisplay: '₹4,000',
+    risk: 'Duplicate event delivery',
+    outcomeLabel: 'Exactly one financial effect',
     steps: [
       {
         phase: 'Context',
@@ -680,9 +680,9 @@ const STORIES = [
         heading: 'Providers Guarantee At-Least-Once Delivery',
         narrative: 'Razorpay and other payment providers guarantee webhook delivery — meaning the same event can legitimately arrive more than once. Dispute Shield must handle this without creating duplicate financial effects.',
         cards: [
-          { label: 'Scenario',   value: 'Duplicate webhook delivery' },
-          { label: 'Refund',     value: '₹4,000 — PENDING' },
-          { label: 'Challenge',  value: 'Process exactly once' },
+          { label: 'Scenario', value: 'Duplicate webhook delivery' },
+          { label: 'Refund', value: '₹4,000 — PENDING' },
+          { label: 'Challenge', value: 'Process exactly once' },
         ],
         cta: 'Deliver First Webhook →',
         ctaClass: 'cta-continue',
@@ -699,13 +699,17 @@ const STORIES = [
             eng._dupEventId = `evt_dup_demo_${Date.now()}`;
             return await apiPost('/webhooks/razorpay', {
               event: 'refund.processed',
-              payload: { refund: { entity: {
-                id: eng.story.refundIdForWebhook,
-                payment_id: eng.story.paymentId,
-                amount: eng.story.amountPaise,
-                status: 'processed',
-                acquirer_data: { arn: `ARN_DUP_${Date.now()}` },
-              }}},
+              payload: {
+                refund: {
+                  entity: {
+                    id: eng.story.refundIdForWebhook,
+                    payment_id: eng.story.paymentId,
+                    amount: eng.story.amountPaise,
+                    status: 'processed',
+                    acquirer_data: { arn: `ARN_DUP_${Date.now()}` },
+                  }
+                }
+              },
             }, { 'x-razorpay-event-id': eng._dupEventId });
           },
           buildResult: (data) => ({
@@ -731,13 +735,17 @@ const STORIES = [
           execute: async (eng) => {
             return await apiPost('/webhooks/razorpay', {
               event: 'refund.processed',
-              payload: { refund: { entity: {
-                id: eng.story.refundIdForWebhook,
-                payment_id: eng.story.paymentId,
-                amount: eng.story.amountPaise,
-                status: 'processed',
-                acquirer_data: { arn: 'ARN_RETRY_ATTEMPT' },
-              }}},
+              payload: {
+                refund: {
+                  entity: {
+                    id: eng.story.refundIdForWebhook,
+                    payment_id: eng.story.paymentId,
+                    amount: eng.story.amountPaise,
+                    status: 'processed',
+                    acquirer_data: { arn: 'ARN_RETRY_ATTEMPT' },
+                  }
+                }
+              },
             }, { 'x-razorpay-event-id': eng._dupEventId });
           },
           buildResult: (data) => ({
@@ -762,10 +770,10 @@ const STORIES = [
           icon: '🛡️',
           title: 'Idempotency Preserved',
           items: [
-            { label: 'First Delivery',  value: 'processed → ledger event created', cls: 'green' },
-            { label: 'Second Delivery', value: 'duplicate_event_ignored',          cls: 'green' },
-            { label: 'Ledger Events',   value: '1 (not 2)',                        cls: 'green' },
-            { label: 'Financial Effect', value: 'Exactly once',                   cls: 'green' },
+            { label: 'First Delivery', value: 'processed → ledger event created', cls: 'green' },
+            { label: 'Second Delivery', value: 'duplicate_event_ignored', cls: 'green' },
+            { label: 'Ledger Events', value: '1 (not 2)', cls: 'green' },
+            { label: 'Financial Effect', value: 'Exactly once', cls: 'green' },
           ],
         }),
         cta: '↺ Replay Story',
@@ -779,24 +787,24 @@ const STORIES = [
   // STORY 7 — WEBHOOK_FAILURE (retry)
   // ════════════════════════════════════════════════════════════
   {
-    id:              'WEBHOOK_FAILURE',
+    id: 'WEBHOOK_FAILURE',
     scenarioApiName: 'WEBHOOK_FAILURE',
-    paymentId:       'scen_wf_001',
-    amountPaise:     600000,
+    paymentId: 'scen_wf_001',
+    amountPaise: 600000,
     refundIdForWebhook: 'rfnd_wf_001',
-    num:             '07',
-    icon:            '⏱️',
-    badge:           'SYS',
-    badgeClass:      'badge-sys',
-    featured:        false,
-    riskClass:       'risk-sys',
-    title:           'The Network Went Down',
-    tagline:         'A refund was initiated but the network timed out. Is it safe to retry?',
-    customer:        'System Reliability',
-    product:         '₹6,000 payment',
-    amountDisplay:   '₹6,000',
-    risk:            'Network timeout — retry needed',
-    outcomeLabel:    'Safe retry — one refund, no double-charge',
+    num: '07',
+    icon: '⏱️',
+    badge: 'SYS',
+    badgeClass: 'badge-sys',
+    featured: false,
+    riskClass: 'risk-sys',
+    title: 'The Network Went Down',
+    tagline: 'A refund was initiated but the network timed out. Is it safe to retry?',
+    customer: 'System Reliability',
+    product: '₹6,000 payment',
+    amountDisplay: '₹6,000',
+    risk: 'Network timeout — retry needed',
+    outcomeLabel: 'Safe retry — one refund, no double-charge',
     steps: [
       {
         phase: 'Context',
@@ -804,10 +812,10 @@ const STORIES = [
         heading: 'The Refund Got Stuck',
         narrative: 'A ₹6,000 refund was initiated. The call reached the provider — but the middleware lost the response due to a network timeout. The refund is stuck in PENDING. Can we retry without double-charging?',
         cards: [
-          { label: 'Refund',          value: '₹6,000' },
-          { label: 'Status',          value: 'PENDING',           cls: 'orange' },
-          { label: 'Idempotency Key', value: 'idem-ri_wf_001',   cls: 'mono' },
-          { label: 'Question',        value: 'Safe to retry?' },
+          { label: 'Refund', value: '₹6,000' },
+          { label: 'Status', value: 'PENDING', cls: 'orange' },
+          { label: 'Idempotency Key', value: 'idem-ri_wf_001', cls: 'mono' },
+          { label: 'Question', value: 'Safe to retry?' },
         ],
         cta: 'Process the Refund →',
         ctaClass: 'cta-continue',
@@ -824,13 +832,17 @@ const STORIES = [
             eng._wfEventId = `evt_wf_retry_${Date.now()}`;
             return await apiPost('/webhooks/razorpay', {
               event: 'refund.processed',
-              payload: { refund: { entity: {
-                id: eng.story.refundIdForWebhook,
-                payment_id: eng.story.paymentId,
-                amount: eng.story.amountPaise,
-                status: 'processed',
-                acquirer_data: { arn: `ARN_WF_${Date.now()}` },
-              }}},
+              payload: {
+                refund: {
+                  entity: {
+                    id: eng.story.refundIdForWebhook,
+                    payment_id: eng.story.paymentId,
+                    amount: eng.story.amountPaise,
+                    status: 'processed',
+                    acquirer_data: { arn: `ARN_WF_${Date.now()}` },
+                  }
+                }
+              },
             }, { 'x-razorpay-event-id': eng._wfEventId });
           },
           buildResult: (data) => ({
@@ -855,9 +867,9 @@ const STORIES = [
           icon: '🛡️',
           title: 'Safe Retry Complete',
           items: [
-            { label: 'Refund Status',      value: 'PROCESSED',                            cls: 'green' },
-            { label: 'Double Charge Risk', value: 'None — idempotency key protected',     cls: 'green' },
-            { label: 'Ledger Events',      value: '1 REFUND_PROCESSED',                   cls: 'green' },
+            { label: 'Refund Status', value: 'PROCESSED', cls: 'green' },
+            { label: 'Double Charge Risk', value: 'None — idempotency key protected', cls: 'green' },
+            { label: 'Ledger Events', value: '1 REFUND_PROCESSED', cls: 'green' },
           ],
         }),
         cta: '↺ Replay Story',
@@ -871,24 +883,24 @@ const STORIES = [
   // STORY 8 — OUT_OF_ORDER_WEBHOOK
   // ════════════════════════════════════════════════════════════
   {
-    id:              'OUT_OF_ORDER_WEBHOOK',
+    id: 'OUT_OF_ORDER_WEBHOOK',
     scenarioApiName: 'OUT_OF_ORDER_WEBHOOK',
-    paymentId:       'scen_ooo_001',
-    amountPaise:     500000,
+    paymentId: 'scen_ooo_001',
+    amountPaise: 500000,
     refundIdForWebhook: 'rfnd_ooo_001',
-    num:             '08',
-    icon:            '🔀',
-    badge:           'SYS',
-    badgeClass:      'badge-sys',
-    featured:        false,
-    riskClass:       'risk-sys',
-    title:           'Events Arrived Out of Order',
-    tagline:         'A stale webhook arrives after the refund is already processed. Does the state regress?',
-    customer:        'System Reliability',
-    product:         '₹5,000 payment',
-    amountDisplay:   '₹5,000',
-    risk:            'Out-of-order event delivery',
-    outcomeLabel:    'State preserved — original ARN unchanged',
+    num: '08',
+    icon: '🔀',
+    badge: 'SYS',
+    badgeClass: 'badge-sys',
+    featured: false,
+    riskClass: 'risk-sys',
+    title: 'Events Arrived Out of Order',
+    tagline: 'A stale webhook arrives after the refund is already processed. Does the state regress?',
+    customer: 'System Reliability',
+    product: '₹5,000 payment',
+    amountDisplay: '₹5,000',
+    risk: 'Out-of-order event delivery',
+    outcomeLabel: 'State preserved — original ARN unchanged',
     steps: [
       {
         phase: 'Context',
@@ -896,10 +908,10 @@ const STORIES = [
         heading: 'The Refund Is Already Done',
         narrative: 'A ₹5,000 refund has already been processed with a confirmed ARN. But a delayed, stale webhook from an earlier network retry is about to arrive with a different event ID — and a different ARN.',
         cards: [
-          { label: 'Refund Status', value: 'PROCESSED',     cls: 'green' },
-          { label: 'Original ARN',  value: 'ARN_OOO_001',   cls: 'mono' },
-          { label: 'Stale Event',   value: 'About to arrive (delayed delivery)' },
-          { label: 'Risk',          value: 'Could the ARN be overwritten?' },
+          { label: 'Refund Status', value: 'PROCESSED', cls: 'green' },
+          { label: 'Original ARN', value: 'ARN_OOO_001', cls: 'mono' },
+          { label: 'Stale Event', value: 'About to arrive (delayed delivery)' },
+          { label: 'Risk', value: 'Could the ARN be overwritten?' },
         ],
         cta: 'Send Stale Webhook →',
         ctaClass: 'cta-continue',
@@ -915,13 +927,17 @@ const STORIES = [
           execute: async (eng) => {
             return await apiPost('/webhooks/razorpay', {
               event: 'refund.processed',
-              payload: { refund: { entity: {
-                id: eng.story.refundIdForWebhook,
-                payment_id: eng.story.paymentId,
-                amount: eng.story.amountPaise,
-                status: 'processed',
-                acquirer_data: { arn: 'ARN_STALE_OVERWRITE_ATTEMPT' },
-              }}},
+              payload: {
+                refund: {
+                  entity: {
+                    id: eng.story.refundIdForWebhook,
+                    payment_id: eng.story.paymentId,
+                    amount: eng.story.amountPaise,
+                    status: 'processed',
+                    acquirer_data: { arn: 'ARN_STALE_OVERWRITE_ATTEMPT' },
+                  }
+                }
+              },
             }, { 'x-razorpay-event-id': `evt_ooo_stale_${Date.now()}` });
           },
           buildResult: (data) => ({
@@ -946,10 +962,10 @@ const STORIES = [
           icon: '🛡️',
           title: 'State Preserved',
           items: [
-            { label: 'Refund Status', value: 'PROCESSED (unchanged)',     cls: 'green' },
-            { label: 'Original ARN',  value: 'ARN_OOO_001 (preserved)',   cls: 'mono' },
-            { label: 'Stale Event',   value: 'already_processed — ignored', cls: 'green' },
-            { label: 'State Regression', value: 'Prevented',             cls: 'green' },
+            { label: 'Refund Status', value: 'PROCESSED (unchanged)', cls: 'green' },
+            { label: 'Original ARN', value: 'ARN_OOO_001 (preserved)', cls: 'mono' },
+            { label: 'Stale Event', value: 'already_processed — ignored', cls: 'green' },
+            { label: 'State Regression', value: 'Prevented', cls: 'green' },
           ],
         }),
         cta: '↺ Replay Story',
@@ -1075,16 +1091,16 @@ async function startStory(storyId) {
   if (!story) return;
 
   // Reset engine
-  engine.story         = story;
-  engine.stepIndex     = 0;
-  engine.scenarioData  = null;
-  engine.stateData     = null;
-  engine.refundData    = null;
-  engine.defenseData   = null;
-  engine.techLogs      = [];
+  engine.story = story;
+  engine.stepIndex = 0;
+  engine.scenarioData = null;
+  engine.stateData = null;
+  engine.refundData = null;
+  engine.defenseData = null;
+  engine.techLogs = [];
   engine._stepResultData = null;
-  engine._dupEventId   = null;
-  engine._wfEventId    = null;
+  engine._dupEventId = null;
+  engine._wfEventId = null;
 
   // Switch to story screen
   showScreen('screen-story');
@@ -1255,8 +1271,8 @@ function buildStepHTML(step, showResult) {
 
 function bindStepCta(step, showResult) {
   const ctaEl = document.getElementById('stepCta');
-  const advEl  = document.getElementById('stepAdvanceCta');
-  const tryEl  = document.getElementById('tryAnotherBtn');
+  const advEl = document.getElementById('stepAdvanceCta');
+  const tryEl = document.getElementById('tryAnotherBtn');
 
   if (tryEl) {
     tryEl.addEventListener('click', () => showScreen('screen-selection'));
@@ -1468,29 +1484,41 @@ function renderSideState() {
     return;
   }
 
-  const risk    = sd.risk_state    || {};
-  const refunds = sd.refunds       || [];
-  const disputes= sd.disputes      || [];
-  const dps     = sd.defense_packages || [];
+  const risk = sd.risk_state || {};
+  const refunds = sd.refunds || [];
+  const disputes = sd.disputes || [];
+  const dps = sd.defense_packages || [];
   const latestR = refunds[0];
-  const dp      = dps[0];
+  const dp = dps[0];
 
   const rows = [
-    { label: 'Payment',  value: sd.payment?.status || '—',
-      cls: sd.payment?.status === 'CAPTURED' ? 'green' : '' },
-    { label: 'Risk',     value: risk.would_block_refund ? 'BLOCKED' : 'SAFE',
-      cls: risk.would_block_refund ? 'red' : 'green' },
-    { label: 'Disputes', value: disputes.length > 0 ? `${disputes.filter(d=>d.status==='OPEN').length} OPEN` : 'None',
-      cls: disputes.some(d=>d.status==='OPEN') ? 'red' : 'green' },
-    { label: 'Refund',   value: latestR?.status || 'None',
-      cls: latestR?.status === 'PROCESSED' ? 'green' : latestR ? 'orange' : '' },
-    { label: 'ARN',      value: latestR?.arn ? latestR.arn.slice(0,14)+'…' : '—',
-      cls: latestR?.arn ? 'green' : '' },
+    {
+      label: 'Payment', value: sd.payment?.status || '—',
+      cls: sd.payment?.status === 'CAPTURED' ? 'green' : ''
+    },
+    {
+      label: 'Risk', value: risk.would_block_refund ? 'BLOCKED' : 'SAFE',
+      cls: risk.would_block_refund ? 'red' : 'green'
+    },
+    {
+      label: 'Disputes', value: disputes.length > 0 ? `${disputes.filter(d => d.status === 'OPEN').length} OPEN` : 'None',
+      cls: disputes.some(d => d.status === 'OPEN') ? 'red' : 'green'
+    },
+    {
+      label: 'Refund', value: latestR?.status || 'None',
+      cls: latestR?.status === 'PROCESSED' ? 'green' : latestR ? 'orange' : ''
+    },
+    {
+      label: 'ARN', value: latestR?.arn ? latestR.arn.slice(0, 14) + '…' : '—',
+      cls: latestR?.arn ? 'green' : ''
+    },
     ...(dp ? [
       { label: 'Contestable', value: inr(dp.contestable_amount_paise), cls: 'green' },
-      { label: 'Uncovered',   value: inr(dp.uncovered_amount_paise),   cls: dp.uncovered_amount_paise > 0 ? 'red' : 'green' },
-      { label: 'Defense',     value: dp.status,
-        cls: dp.status === 'READY' ? 'green' : dp.status === 'PARTIALLY_DEFENSIBLE' ? 'orange' : 'red' },
+      { label: 'Uncovered', value: inr(dp.uncovered_amount_paise), cls: dp.uncovered_amount_paise > 0 ? 'red' : 'green' },
+      {
+        label: 'Defense', value: dp.status,
+        cls: dp.status === 'READY' ? 'green' : dp.status === 'PARTIALLY_DEFENSIBLE' ? 'orange' : 'red'
+      },
     ] : []),
   ];
 
@@ -1513,10 +1541,10 @@ async function refreshMetrics() {
     if (!headerMetrics) return;
 
     const pills = [
-      { label: 'Intercepted',      value: data.refund_requests_intercepted, cls: '' },
-      { label: 'Blocked',          value: data.dangerous_refunds_blocked,   cls: data.dangerous_refunds_blocked > 0 ? 'red' : '' },
-      { label: 'Protected',        value: inr(data.duplicate_outflow_prevented_paise), cls: 'green' },
-      { label: 'Defense Packages', value: data.defense_packages_generated,  cls: '' },
+      { label: 'Intercepted', value: data.refund_requests_intercepted, cls: '' },
+      { label: 'Blocked', value: data.dangerous_refunds_blocked, cls: data.dangerous_refunds_blocked > 0 ? 'red' : '' },
+      { label: 'Protected', value: inr(data.duplicate_outflow_prevented_paise), cls: 'green' },
+      { label: 'Defense Packages', value: data.defense_packages_generated, cls: '' },
     ];
 
     headerMetrics.innerHTML = pills.map(p => `
@@ -1533,14 +1561,14 @@ async function refreshMetrics() {
 // ============================================================
 
 async function checkApiStatus() {
-  const dot  = document.getElementById('apiStatusDot');
+  const dot = document.getElementById('apiStatusDot');
   const text = document.getElementById('apiStatusText');
   try {
     const data = await apiGet('/');
-    dot.className  = 'status-dot connected';
+    dot.className = 'status-dot connected';
     text.textContent = `${data.service} v${data.version}`;
   } catch {
-    dot.className  = 'status-dot error';
+    dot.className = 'status-dot error';
     text.textContent = 'API offline';
   }
 }
@@ -1550,9 +1578,9 @@ async function checkApiStatus() {
 // ============================================================
 
 function initTechToggle() {
-  const btn     = document.getElementById('techToggleBtn');
+  const btn = document.getElementById('techToggleBtn');
   const content = document.getElementById('techLog');
-  const arrow   = document.getElementById('techArrow');
+  const arrow = document.getElementById('techArrow');
   if (!btn || !content) return;
 
   btn.addEventListener('click', () => {
