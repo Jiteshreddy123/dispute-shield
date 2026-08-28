@@ -52,6 +52,16 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+def on_startup():
+    from app.db.init_db import init_db
+    try:
+        init_db()
+        print("Startup: Database tables verified/initialized.")
+    except Exception as e:
+        print(f"Startup DB init warning: {e}")
+
+
 # =========================================================
 # HEALTH CHECK
 # =========================================================
