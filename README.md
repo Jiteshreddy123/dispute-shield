@@ -47,42 +47,25 @@ Each scenario tells a human story (Ramu's ₹5,000 jacket) before revealing the 
 
 ## How It Works: Prevent → Execute → Defend
 
-```
-Support Agent clicks Refund
-        │
-        ▼
-Dispute Shield Middleware (FastAPI)
-        │
-        ├── Is there an active dispute?     → BLOCK
-        ├── Is there a pre-dispute alert?   → BLOCK
-        ├── Would this over-refund?         → BLOCK
-        └── None of the above              → APPROVE
-                                                │
-                                                ▼
-                                         execute_refund()
-                                                │
-                                                ▼
-                                        Razorpay Provider
-                                         (idempotent key)
-                                                │
-                                                ▼
-                                    POST /webhooks/razorpay
-                                     refund.processed
-                                                │
-                                                ▼
-                                    Refund → PROCESSED
-                                    ARN recorded in ledger
+The system operates across two core operational phases:
 
-Later: POST /webhooks/razorpay/dispute
-        payment.dispute.created
-                │
-                ▼
-        Evidence Matcher
-                │
-                ▼
-        Defense Package
-        (refund_confirmation + customer_communication)
-```
+### Phase 1: Real-Time Interception (Prevent)
+When a customer support agent initiates a refund, Dispute Shield intercepts the call **before** the payment processor is contacted. It evaluates active chargeback states, pre-dispute alerts (Visa/Mastercard feeds), and remaining balances to block duplicate outflows.
+
+<p align="center">
+  <img src="docs/architecture/phase-1-prevent-interception.jpg" alt="Phase 1: Real-Time Refund Interception Architecture" width="85%" />
+</p>
+
+---
+
+### Phase 2: Ledger Confirmation & Automated Defense (Execute & Defend)
+If cleared, the refund is executed with an idempotency key and confirmed via webhook to an append-only hashed ledger. When a bank dispute arises later in time, the defense engine automatically reconciles prior refunds, extracts ARNs, gathers customer support logs, and generates a structured defense package.
+
+<p align="center">
+  <img src="docs/architecture/phase-2-execute-and-defend.jpg" alt="Phase 2: Execution, Ledger & Dispute Defense Architecture" width="85%" />
+</p>
+
+---
 
 **The financial safety decision is strictly deterministic — rule-verified before payment execution.**
 
