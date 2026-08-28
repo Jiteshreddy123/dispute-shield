@@ -10,7 +10,7 @@
  * - The story engine calls /api/scenarios/reset + /api/scenarios/load/ before each run
  */
 
-const API_BASE = 'http://localhost:https://dispute-shield-production-be56.up.railway.app/';
+const API_BASE = 'https://dispute-shield-production-be56.up.railway.app';
 
 // ============================================================
 // API HELPERS
