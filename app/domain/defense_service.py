@@ -6,7 +6,7 @@ Builds a grounded defense package for a dispute.
 Rules:
 - ONLY use evidence that actually exists in the database.
 - NEVER invent ARN, refund amounts, or support messages.
-- AI/LLM summary is grounded in structured retrieved facts.
+- Defense summary is strictly grounded in structured retrieved facts.
 - Deterministic financial calculations use integer paise.
 """
 
@@ -96,9 +96,8 @@ def build_defense_package(
     )
 
     # --------------------------------------------------------
-    # 5. Generate grounded defense summary
-    #    This is rule-based text grounded in structured facts.
-    #    An LLM could improve fluency but must NOT invent facts.
+    # 5. Generate structured defense summary
+    #    Assembled directly from verified transaction records.
     # --------------------------------------------------------
     summary = _generate_summary(
         payment_id=payment_id,
@@ -215,8 +214,7 @@ def _generate_summary(
     missing_evidence: list,
 ) -> str:
     """
-    Generate a grounded defense summary from structured facts.
-    This is deterministic rule-based text — no LLM hallucination risk.
+    Generate a structured dispute defense narrative from verified facts.
     """
     lines = [
         f"DISPUTE DEFENSE SUMMARY",

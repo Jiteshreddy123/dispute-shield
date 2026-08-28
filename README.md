@@ -85,9 +85,9 @@ Later: POST /webhooks/razorpay/dispute
         (refund_confirmation + customer_communication)
 ```
 
-**The financial safety decision is deterministic — never delegated to an LLM.**
+**The financial safety decision is strictly deterministic — rule-verified before payment execution.**
 
-AI is used only for synthesizing unstructured support communication into the defense narrative. It never touches money movement logic.
+The system ensures that money-movement logic is 100% verifiable and grounded in ledger state.
 
 ---
 
@@ -242,7 +242,7 @@ fly deploy
 |---|---|
 | Pre-dispute alerts | **Simulated** — not live Verifi/Ethoca/CDRN integration |
 | Razorpay provider | **Mocked** — no real API calls made |
-| AI defense narrative | **Rule-based text** — LLM would improve fluency, not required for correctness |
+| Defense narrative | **Rule-based grounded synthesis** — structured facts formatted for issuer review |
 | Dispute outcomes | **Not guaranteed** — depend on issuer/network decisions |
 | Webhook HMAC | Not validated in prototype — add `X-Razorpay-Signature` check in production |
 | Distributed locking | Row-level `SELECT FOR UPDATE` — replace with distributed lock in multi-node deployment |
