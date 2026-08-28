@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dispute Shield — Financial Safety Middleware</title>
+  <meta name="description" content="See what happens when refunds and disputes collide. Dispute Shield intercepts refunds when disputes are brewing and automatically builds ironclad evidence packages for chargebacks." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="app-header" id="appHeader">
+    <div class="header-left">
+      <button class="back-btn hidden" id="backBtn" aria-label="Back to stories" title="Back to stories">
+        ← Stories
+      </button>
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
+            <path d="M14 2L3 8v12l11 6 11-6V8L14 2z" stroke="#6366f1" stroke-width="2" fill="none"/>
+            <path d="M14 2v24M3 8l11 6 11-6" stroke="#6366f1" stroke-width="1.5" opacity="0.5"/>
+            <circle cx="14" cy="14" r="3" fill="#6366f1"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Dispute Shield</span>
+          <span class="brand-tagline">Financial Safety Middleware</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-metrics" id="headerMetrics">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="header-right">
+      <div class="api-status">
+        <div class="status-dot" id="apiStatusDot"></div>
+        <span id="apiStatusText">Connecting…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== TOAST ===================== -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <!-- ===================== SCREEN: SELECTION ===================== -->
+  <div id="screen-selection" class="screen">
+
+    <div class="hero-section">
+      <div class="hero-pill">Interactive Financial Simulation</div>
+      <h1 class="hero-title">
+        See what happens when<br>
+        <span class="hero-title-accent">refunds and disputes collide.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Dispute Shield sits between your support CRM and Razorpay — intercepting refunds when
+        a bank dispute is already brewing, and automatically building evidence packages
+        when a chargeback arrives.
+      </p>
+      <p class="hero-choose-label">↓ Choose a story</p>
+    </div>
+
+    <div class="stories-grid" id="storiesGrid">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-title">How it works</div>
+      <div class="flow-nodes">
+        <div class="flow-node">
+          <div class="flow-node-icon">👥</div>
+          <div class="flow-node-label">Support CRM</div>
+          <div class="flow-node-sub">Agent clicks Refund</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node flow-node-shield">
+          <div class="flow-node-icon">🛡️</div>
+          <div class="flow-node-label">Dispute Shield</div>
+          <div class="flow-node-sub">Middleware intercepts</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">
+          <div class="flow-node-icon">🔍</div>
+          <div class="flow-node-label">Risk Check</div>
+          <div class="flow-node-sub">Deterministic logic</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-split">
+          <div class="flow-node flow-node-block">
+            <div class="flow-node-icon">🚫</div>
+            <div class="flow-node-label">BLOCK</div>
+          </div>
+          <span class="flow-or">or</span>
+          <div class="flow-node flow-node-approve">
+            <div class="flow-node-icon">✅</div>
+            <div class="flow-node-label">APPROVE</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">
+          <div class="flow-node-icon">⚖️</div>
+          <div class="flow-node-label">Defense</div>
+          <div class="flow-node-sub">Auto-assembled</div>
+        </div>
+      </div>
+      <p class="flow-note">
+        <strong>Prevent → Execute → Defend</strong> ·
+        Financial safety decisions are deterministic — no LLM in the money path.
+      </p>
+    </div>
+  </div>
+
+  <!-- ===================== SCREEN: STORY ===================== -->
+  <div id="screen-story" class="screen hidden">
+
+    <!-- Progress bar -->
+    <div class="story-topbar">
+      <div class="story-scenario-label" id="storyScenarioLabel">Loading…</div>
+      <div class="story-progress" id="storyProgress">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Story layout: main + sidebar -->
+    <div class="story-layout">
+
+      <!-- Main story content -->
+      <div class="story-main" id="storyMain">
+        <div class="story-loading">
+          <div class="loading-spinner"></div>
+          <p>Setting up scenario…</p>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="story-side" id="storySide">
+
+        <!-- Scenario context -->
+        <div class="side-card" id="sideContext">
+          <div class="side-card-title">Scenario</div>
+          <div class="side-context-body" id="sideContextBody">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Live state summary -->
+        <div class="side-card" id="sideState">
+          <div class="side-card-title">Live State</div>
+          <div class="side-state-body" id="sideStateBody">
+            <div class="side-placeholder">Load a scenario to see state</div>
+          </div>
+        </div>
+
+        <!-- Tech log (collapsible) -->
+        <div class="side-card side-tech-card">
+          <button class="tech-toggle" id="techToggleBtn" aria-expanded="false">
+            <span>⚙ System Log</span>
+            <span class="tech-arrow" id="techArrow">▾</span>
+          </button>
+          <div class="tech-log-content hidden" id="techLog">
+            <!-- Log entries added by JS -->
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="app-footer">
+    <p>
+      Dispute Shield · Razorpay Buildathon Prototype ·
+      <span class="footer-note">Pre-alert integration is simulated. Dispute outcomes are not guaranteed.</span>
+    </p>
+    <a href="http://localhost:8000/docs" target="_blank" class="footer-link">API Docs ↗</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
