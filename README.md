@@ -48,22 +48,94 @@ Each scenario tells a human story (Ramu's ₹5,000 jacket) before revealing the 
 ## How It Works: Prevent → Execute → Defend
 
 The system operates across two core operational phases:
-
+ 
 ### Phase 1: Real-Time Interception (Prevent)
 When a customer support agent initiates a refund, Dispute Shield intercepts the call **before** the payment processor is contacted. It evaluates active chargeback states, pre-dispute alerts (Visa/Mastercard feeds), and remaining balances to block duplicate outflows.
 
-<p align="center">
-  <img src="docs/architecture/phase-1-prevent-interception.jpg" alt="Phase 1: Real-Time Refund Interception Architecture" width="85%" />
-</p>
+```mermaid
+flowchart TD
+    subgraph S1["Merchant Support Layer"]
+        CRM["Merchant Support CRM"]
+        AgentAction["Support Agent Clicks 'Refund'"]
+        CRM --> AgentAction
+    end
+
+    subgraph S2["Dispute Shield Interceptor Middleware"]
+        API["POST /api/refunds/request"]
+        RiskEngine{"Deterministic Risk Engine"}
+        
+        Check1["1. Payment State Check"]
+        Check2["2. Active Dispute Open?"]
+        Check3["3. Network Pre-Alert Signal?"]
+        Check4["4. Over-Refund Balance Check"]
+        
+        API --> RiskEngine
+        RiskEngine -.-> Check1
+        RiskEngine -.-> Check2
+        RiskEngine -.-> Check3
+        RiskEngine -.-> Check4
+    end
+
+    subgraph S3["Decision Engine"]
+        BlockDecision["🚫 BLOCK REFUND"]
+        PreventMsg["Prevent Duplicate Payout<br/>(Provider Never Called)"]
+        
+        ClearDecision["✅ APPROVE REFUND"]
+        ProceedMsg["Proceed to Safe Execution Pipeline"]
+        
+        RiskEngine -->|"Dispute / Pre-Alert Active"| BlockDecision
+        BlockDecision --> PreventMsg
+        
+        RiskEngine -->|"Clean State"| ClearDecision
+        ClearDecision --> ProceedMsg
+    end
+
+    AgentAction --> API
+```
 
 ---
 
 ### Phase 2: Ledger Confirmation & Automated Defense (Execute & Defend)
 If cleared, the refund is executed with an idempotency key and confirmed via webhook to an append-only hashed ledger. When a bank dispute arises later in time, the defense engine automatically reconciles prior refunds, extracts ARNs, gathers customer support logs, and generates a structured defense package.
 
-<p align="center">
-  <img src="docs/architecture/phase-2-execute-and-defend.jpg" alt="Phase 2: Execution, Ledger & Dispute Defense Architecture" width="85%" />
-</p>
+```mermaid
+flowchart TD
+    subgraph P1["Safe Execution & Ledger Lock"]
+        ClearTrigger["Approved Refund Intent"]
+        ProviderCall["Call Razorpay API (With Idempotency Key)"]
+        Webhook["POST /webhooks/razorpay (refund.processed)"]
+        Ledger["Append-Only Hashed Ledger (ARN Recorded)"]
+        
+        ClearTrigger --> ProviderCall
+        ProviderCall --> Webhook
+        Webhook --> Ledger
+    end
+
+    subgraph P2["Later Dispute Arrival"]
+        BankDispute["Customer Files Bank Chargeback (Later in Time)"]
+        DisputeWebhook["POST /webhooks/razorpay/dispute (payment.dispute.created)"]
+        
+        BankDispute --> DisputeWebhook
+    end
+
+    subgraph P3["Autonomous Evidence & Defense Assembly"]
+        Matcher["Evidence Matcher & Reconciliation Engine"]
+        Ev1["Verified Prior Refunds & Banking ARNs"]
+        Ev2["Customer Support Chat & Ticket History"]
+        Ev3["Contestable Amount vs Uncovered Exposure"]
+        
+        DisputeWebhook --> Matcher
+        Ledger -.-> Matcher
+        Matcher --> Ev1
+        Matcher --> Ev2
+        Matcher --> Ev3
+        
+        DefensePkg["⚖️ Defense Package Assembled (Ready for Issuer Review)"]
+        Ev1 --> DefensePkg
+        Ev2 --> DefensePkg
+        Ev3 --> DefensePkg
+    end
+```
 
 ---
 
