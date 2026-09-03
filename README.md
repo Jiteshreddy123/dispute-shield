@@ -98,6 +98,9 @@ flowchart TD
 ### Phase 2: Ledger Confirmation & Automated Defense (Execute & Defend)
 If cleared, the refund is executed with an idempotency key and confirmed via webhook to an append-only hashed ledger. When a bank dispute arises later in time, the defense engine automatically reconciles prior refunds, extracts ARNs, gathers customer support logs, and generates a structured defense package.
 
+
+<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/7bc48bee-0ca0-4235-bdc3-2d0b2489f21c" />
+
 ```mermaid
 flowchart TD
     subgraph P1["Safe Execution & Ledger Lock"]
