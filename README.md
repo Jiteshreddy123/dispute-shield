@@ -133,40 +133,6 @@ ProviderEvent    → idempotency layer for webhook deduplication
 | `POST /webhooks/razorpay` | Handle `refund.processed` events (idempotent) |
 | `POST /webhooks/razorpay/dispute` | Handle `payment.dispute.created` events |
 
----
-
-## Quick Start (Local)
-
-### Prerequisites
-- Python 3.13+
-- PostgreSQL running on `localhost:1234`, database `dispute-shield`
-- `.env` with `DATABASE_URL=postgresql://...`
-
-### Run locally in 4 commands
-
-```powershell
-# 1. Install dependencies
-.venv\Scripts\pip install -r requirements.txt
-
-# 2. Initialise the database
-.venv\Scripts\python.exe -m app.db.init_db
-
-# 3. Start the backend
-.venv\Scripts\uvicorn.exe app.main:app --host 0.0.0.0 --port 8000 --reload
-
-# 4. Start the frontend (new terminal)
-.venv\Scripts\python.exe -m http.server 3000 --directory frontend
-```
-
-### Run Tests
-
-```powershell
-.venv\Scripts\python.exe -m pytest tests/ -v
-# Expected: 13 passed
-```
-
----
-
 ## Project Structure
 
 ```
